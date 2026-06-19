@@ -68,6 +68,8 @@ function getCategoryStyle(
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Goods Galaxy Affiliated - Curated Amazon Affiliate Products',
   description: 'Discover handpicked Amazon products curated with care for discerning readers.',

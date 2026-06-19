@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { v2 as cloudinary } from 'cloudinary';
 import { updateSetting } from '@/lib/settings';
 
@@ -65,6 +66,10 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
+
+      // Revalidate homepage and admin settings so they reflect the new hero image immediately
+      revalidatePath('/');
+      revalidatePath('/admin/settings');
     }
 
     return NextResponse.json({
