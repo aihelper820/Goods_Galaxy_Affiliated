@@ -10,18 +10,34 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const heroFileInputs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Bypass browser cache for hero image previews by appending a unique version parameter
+  const getPreviewUrl = (url: string) => {
+    if (!url) return '';
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}_cb=${Date.now()}_${refreshKey}`;
+  };
 
   useEffect(() => {
     loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadSettings = async () => {
     setIsLoading(true);
     try {
       const result = await fetchSettingsAction();
+      resultCache = { ...result };
       setSettings(result);
+      setRefreshKey((prev) => prev + 1);
+      console.log('[Settings] Loaded settings from DB:', {
+        hero_image_1: result.hero_image_1,
+        hero_image_2: result.hero_image_2,
+        hero_image_3: result.hero_image_3,
+      });
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error('[Settings] Failed to load settings:', error);
       toast.error('Failed to load settings');
     } finally {
       setIsLoading(false);
@@ -40,12 +56,15 @@ export default function SettingsPage() {
     try {
       const result = await updateSettingAction(key, settings[key]);
       if (result.success) {
+        console.log(`[Settings] Saved "${key}" to DB:`, settings[key]);
+        // Re-fetch settings from DB to confirm sync
+        await loadSettings();
         toast.success(`${key} saved successfully`);
       } else {
         toast.error(result.error || 'Failed to save setting');
       }
     } catch (error) {
-      console.error('Save failed:', error);
+      console.error('[Settings] Save failed:', error);
       toast.error('Failed to save setting');
     } finally {
       setIsSaving(false);
@@ -77,15 +96,42 @@ export default function SettingsPage() {
         return;
       }
 
+      console.log(`[Settings] Uploaded image URL for "${key}":`, imageUrl);
+
+      // --- STEP 1: Immediately update local state for instant preview ---
       setSettings((prev) => ({ ...prev, [key]: imageUrl }));
+      setRefreshKey((prev) => prev + 1);
+
+      // Log what the preview will show immediately
+      console.log(`[Settings] Preview updated immediately:`, {
+        key,
+        uploadedUrl: imageUrl,
+        previewUrl: getPreviewUrl(imageUrl),
+      });
+
+      // --- STEP 2: Then re-fetch from DB to verify synchronization ---
+      await loadSettings();
+
+      // --- STEP 3: Verify sync between DB, storage, preview, and homepage ---
+      const dbUrl = resultCache[key];
+      console.log(`[Settings] === SYNC VERIFICATION for "${key}" ===`);
+      console.log(`[Settings]   Uploaded/Storage URL:   ${imageUrl}`);
+      console.log(`[Settings]   DB value after re-fetch: ${dbUrl || '(not found)'}`);
+      console.log(`[Settings]   Match:                   ${dbUrl === imageUrl ? 'YES ✓' : 'NO ✗'}`);
+      console.log(`[Settings]   Preview will render URL: ${dbUrl || imageUrl}`);
+      console.log(`[Settings]   Homepage (server-side):  re-fetched on next page request`);
+
       toast.success('Image uploaded and saved');
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('[Settings] Upload error:', error);
       toast.error('Upload failed');
     } finally {
       setIsSaving(false);
     }
   };
+
+  // Cache the latest DB fetch result for debug logging
+  let resultCache: Record<string, string> = {};
 
   const isHeroImageField = (key: string) => key.startsWith('hero_image_');
 
@@ -184,9 +230,19 @@ export default function SettingsPage() {
                         <div className="w-48 h-32 overflow-hidden rounded-lg bg-surface-elevated">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={settings[field.key]}
+                            key={`hero-preview-${field.key}-${refreshKey}`}
+                            src={getPreviewUrl(settings[field.key])}
                             alt={field.label}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // If loading fails (cached/expired), force a fresh reload
+                              const img = e.currentTarget;
+                              const url = settings[field.key];
+                              if (url) {
+                                const separator = url.includes('?') ? '&' : '?';
+                                img.src = `${url}${separator}_cb=${Date.now()}_${refreshKey}_retry`;
+                              }
+                            }}
                           />
                         </div>
                       </div>
