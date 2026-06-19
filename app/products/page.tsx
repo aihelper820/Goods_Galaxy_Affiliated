@@ -15,6 +15,8 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const loadProducts = async () => {
       setIsLoading(true);
       try {
@@ -27,10 +29,13 @@ export default function ProductsPage() {
           params.set('search', searchQuery.trim());
         }
 
-        const response = await fetch(`/api/products?${params.toString()}`);
+        const response = await fetch(`/api/products?${params.toString()}`, {
+          signal: abortController.signal,
+        });
         const result = (await response.json()) as PaginatedResponse<Product>;
         setProducts(result);
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('Failed to load products:', error);
       } finally {
         setIsLoading(false);
@@ -38,6 +43,8 @@ export default function ProductsPage() {
     };
 
     loadProducts();
+
+    return () => abortController.abort();
   }, [currentPage, searchQuery]);
 
   const handleSearch = (value: string) => {

@@ -21,6 +21,8 @@ export default function CategoryPage() {
   useEffect(() => {
     if (!slug) return;
 
+    const abortController = new AbortController();
+
     const loadProducts = async () => {
       setIsLoading(true);
       try {
@@ -34,10 +36,13 @@ export default function CategoryPage() {
           query.set('search', searchQuery.trim());
         }
 
-        const response = await fetch(`/api/products?${query.toString()}`);
+        const response = await fetch(`/api/products?${query.toString()}`, {
+          signal: abortController.signal,
+        });
         const result = (await response.json()) as PaginatedResponse<Product>;
         setProducts(result);
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.error('Failed to load products:', error);
       } finally {
         setIsLoading(false);
@@ -45,6 +50,8 @@ export default function CategoryPage() {
     };
 
     loadProducts();
+
+    return () => abortController.abort();
   }, [slug, currentPage, searchQuery]);
 
   const handleSearch = (value: string) => {

@@ -37,6 +37,8 @@ function getCategoryStyle(
   return { icon: Package, bg: 'bg-indigo-50', ring: 'text-indigo-500' };
 }
 
+export const revalidate = 60;
+
 export const metadata = {
   title: 'Categories | Goods Galaxy Affiliated',
   description: 'Browse products by category',

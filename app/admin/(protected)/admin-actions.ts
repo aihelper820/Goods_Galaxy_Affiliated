@@ -26,23 +26,43 @@ import {
   ApiResponse,
   PaginatedResponse,
 } from '@/lib/types';
+import { revalidatePath } from 'next/cache';
 
 // Products
 export async function createProductAction(
   data: ProductFormData
 ): Promise<ApiResponse<Product>> {
-  return createProduct(data);
+  const result = await createProduct(data);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/products');
+    revalidatePath('/categories');
+  }
+  return result;
 }
 
 export async function updateProductAction(
   id: string,
   data: ProductFormData
 ): Promise<ApiResponse<Product>> {
-  return updateProduct(id, data);
+  const result = await updateProduct(id, data);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/products');
+    revalidatePath('/categories');
+    revalidatePath(`/products/${id}`);
+  }
+  return result;
 }
 
 export async function deleteProductAction(id: string): Promise<ApiResponse<null>> {
-  return deleteProduct(id);
+  const result = await deleteProduct(id);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/products');
+    revalidatePath('/categories');
+  }
+  return result;
 }
 
 export async function fetchProductsAction(
@@ -60,18 +80,34 @@ export async function fetchProductAction(id: string): Promise<Product | null> {
 export async function createCategoryAction(
   data: CategoryFormData
 ): Promise<ApiResponse<Category>> {
-  return createCategory(data);
+  const result = await createCategory(data);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/categories');
+  }
+  return result;
 }
 
 export async function updateCategoryAction(
   id: string,
   data: CategoryFormData
 ): Promise<ApiResponse<Category>> {
-  return updateCategory(id, data);
+  const result = await updateCategory(id, data);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/categories');
+    if (data.slug) revalidatePath(`/categories/${data.slug}`);
+  }
+  return result;
 }
 
 export async function deleteCategoryAction(id: string): Promise<ApiResponse<null>> {
-  return deleteCategory(id);
+  const result = await deleteCategory(id);
+  if (result.success) {
+    revalidatePath('/');
+    revalidatePath('/categories');
+  }
+  return result;
 }
 
 export async function fetchCategoriesAction(): Promise<Category[]> {
@@ -125,6 +161,9 @@ export async function updateSettingAction(
   value: string
 ): Promise<ApiResponse<Record<string, string>>> {
   const result = await updateSetting(key, value);
+  if (result.success) {
+    revalidatePath('/');
+  }
   return {
     success: result.success,
     error: result.error,

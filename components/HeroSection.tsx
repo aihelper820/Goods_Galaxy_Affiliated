@@ -89,34 +89,34 @@ export function HeroSection({
         {/* Left content panel */}
         <div className="relative">
           <div className="absolute -left-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl" aria-hidden="true" />
-          <div className="panel relative z-10 p-6 sm:p-8 lg:p-10">
+          <div className="panel relative z-10 flex flex-col items-center p-6 text-center sm:p-8 lg:p-10">
             {tagline && <div className="section-kicker mb-4">{tagline}</div>}
 
-            <h1 className="max-w-xl text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.04em] text-on-surface leading-tight">
+            <h1 className="max-w-xl text-2xl font-bold leading-tight tracking-[-0.04em] text-on-surface sm:text-3xl md:text-4xl lg:text-5xl">
               {headline}
             </h1>
 
-            <p className="mt-4 sm:mt-5 max-w-xl text-sm sm:text-base md:text-lg leading-6 sm:leading-7 text-on-surface-muted">
+            <p className="mt-4 max-w-md text-sm leading-6 text-on-surface-muted sm:mt-5 sm:text-base sm:leading-7">
               {subheadline}
             </p>
 
-            <div className="mt-6 sm:mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:justify-center">
               <Link href={ctaLinks.primary}>
-                <Button variant="primary" size="lg" className="w-full sm:w-auto justify-center">
+                <Button variant="primary" size="lg" className="w-full justify-center sm:w-auto">
                   {ctaLabels.primary}
                 </Button>
               </Link>
               <Link href={ctaLinks.secondary}>
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto justify-center">
+                <Button variant="ghost" size="lg" className="w-full justify-center sm:w-auto">
                   {ctaLabels.secondary}
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-6 sm:mt-8 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-on-surface-muted">
-              <span className="warm-chip px-3 py-2 bg-surface-container-low rounded-full">Curated discovery</span>
-              <span className="warm-chip px-3 py-2 bg-surface-container-low rounded-full">Warm editorial layout</span>
-              <span className="warm-chip px-3 py-2 bg-surface-container-low rounded-full">Amazon affiliate picks</span>
+            <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-on-surface-muted sm:mt-8">
+              <span className="warm-chip rounded-full px-3 py-2">Curated discovery</span>
+              <span className="warm-chip rounded-full px-3 py-2">Warm editorial layout</span>
+              <span className="warm-chip rounded-full px-3 py-2">Amazon affiliate picks</span>
             </div>
           </div>
         </div>

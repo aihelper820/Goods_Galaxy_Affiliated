@@ -68,7 +68,7 @@ function getCategoryStyle(
   };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export const metadata = {
   title: 'Goods Galaxy Affiliated - Curated Amazon Affiliate Products',
@@ -76,9 +76,11 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts(8);
-  const categories = await getCategories();
-  const settings = await getAllSettings();
+  const [featuredProducts, categories, settings] = await Promise.all([
+    getFeaturedProducts(8),
+    getCategories(),
+    getAllSettings(),
+  ]);
   const heroImages = [
     settings.hero_image_1,
     settings.hero_image_2,
@@ -205,20 +207,22 @@ export default async function HomePage() {
 
         <section className="section-shell">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="panel overflow-hidden px-6 py-10 text-center sm:px-10 sm:py-12">
-              <div className="section-kicker mb-3">Keep exploring</div>
-              <h2 className="section-heading mx-auto max-w-2xl">
-                More to explore across the full catalog
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-on-surface-muted">
-                Browse every curated product, compare picks across categories, and move from discovery to purchase without losing the thread.
-              </p>
-              <div className="mt-8 flex justify-center">
-                <Link href="/products">
-                  <Button variant="primary" size="lg">
-                    View All Products
-                  </Button>
-                </Link>
+            <div className="panel overflow-hidden px-6 py-10 sm:px-10 sm:py-12">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="section-kicker mb-3">Keep exploring</div>
+                <h2 className="section-heading max-w-2xl text-center">
+                  More to explore across the full catalog
+                </h2>
+                <p className="mt-4 max-w-xl text-base leading-7 text-on-surface-muted text-center">
+                  Browse every curated product, compare picks across categories, and move from discovery to purchase without losing the thread.
+                </p>
+                <div className="mt-8">
+                  <Link href="/products">
+                    <Button variant="primary" size="lg">
+                      View All Products
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
