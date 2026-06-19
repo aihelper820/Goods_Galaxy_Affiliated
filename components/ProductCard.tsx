@@ -49,10 +49,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
             <button
               onClick={handleBuyClick}
-              className="shrink-0 rounded-md bg-[#e60023] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#c4001d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:px-5 sm:text-sm min-w-[44px] min-h-[36px] sm:min-h-[44px] flex items-center justify-center"
-              aria-label={`Buy ${product.title}`}
+              className="shrink-0 rounded bg-[#e60023] px-1.5 py-1 text-[0.6rem] font-semibold text-white transition-colors hover:bg-[#c4001d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:px-2 sm:py-1 sm:text-[0.65rem] min-h-[26px] flex items-center justify-center leading-tight"
+              aria-label={`Check ${product.title} on Amazon`}
             >
-              Buy
+              Check on Amazon
             </button>
           </div>
         </div>
