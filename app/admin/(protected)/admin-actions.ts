@@ -6,6 +6,8 @@ import {
   deleteProduct,
   getAllProducts,
   getProductById,
+  getProducts,
+  getRecentProducts,
 } from '@/lib/products';
 import {
   createCategory,
@@ -13,6 +15,7 @@ import {
   deleteCategory,
   getCategories,
   getCategoryById,
+  getRecentCategories,
 } from '@/lib/categories';
 import { updateSetting, getAllSettings } from '@/lib/settings';
 import {
@@ -77,6 +80,43 @@ export async function fetchCategoriesAction(): Promise<Category[]> {
 
 export async function fetchCategoryAction(id: string): Promise<Category | null> {
   return getCategoryById(id);
+}
+
+// Dashboard Stats
+export interface DashboardStats {
+  totalProducts: number
+  totalCategories: number
+  publishedProducts: number
+  featuredProducts: number
+  recentProducts: Product[]
+  recentCategories: Category[]
+}
+
+export async function fetchDashboardStatsAction(): Promise<DashboardStats> {
+  const [
+    allProductsResult,
+    publishedResult,
+    featuredResult,
+    categories,
+    recentProducts,
+    recentCategories,
+  ] = await Promise.all([
+    getAllProducts({ page: 1, per_page: 1 }),
+    getProducts({ page: 1, per_page: 1 }),
+    getAllProducts({ page: 1, per_page: 1, is_featured: true }),
+    getCategories(),
+    getRecentProducts(5),
+    getRecentCategories(5),
+  ])
+
+  return {
+    totalProducts: allProductsResult.total,
+    totalCategories: categories.length,
+    publishedProducts: publishedResult.total,
+    featuredProducts: featuredResult.total,
+    recentProducts,
+    recentCategories,
+  }
 }
 
 // Settings

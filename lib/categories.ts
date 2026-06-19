@@ -51,6 +51,32 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 /**
+ * Get most recent categories (for dashboard activity)
+ */
+export async function getRecentCategories(limit: number = 5): Promise<Category[]> {
+  try {
+    const response = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Query.orderDesc('$createdAt'),
+      Query.limit(limit),
+    ])
+
+    return response.documents
+      .map((doc) => serializeDocument(doc) as unknown as CategoryDocument)
+      .map((serialized) => ({
+        $id: serialized.$id,
+        name: serialized.name,
+        slug: serialized.slug,
+        description: serialized.description,
+        display_order: serialized.display_order,
+        is_active: serialized.is_active,
+        product_count: serialized.product_count,
+      } as Category))
+  } catch {
+    return []
+  }
+}
+
+/**
  * Get category by slug
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {

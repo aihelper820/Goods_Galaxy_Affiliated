@@ -150,6 +150,22 @@ export async function getAllProducts(
 }
 
 /**
+ * Get most recent products (for dashboard activity)
+ */
+export async function getRecentProducts(limit: number = 5): Promise<Product[]> {
+  try {
+    const response = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Query.orderDesc('$updatedAt'),
+      Query.limit(limit),
+    ])
+
+    return response.documents.map((doc) => serializeDocument(doc)) as unknown as Product[]
+  } catch {
+    return []
+  }
+}
+
+/**
  * Get featured products
  */
 export async function getFeaturedProducts(limit: number = 4): Promise<Product[]> {
