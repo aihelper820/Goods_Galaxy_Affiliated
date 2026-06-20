@@ -39,7 +39,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-[#c7c3b8]">
               <li>
                 <a href="mailto:info@gga.com" className="transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary rounded px-1 py-0.5 inline-block">
-                  info@gga.com
+              thegoodsgalaxyaffiliated@gmail.com
                 </a>
               </li>
               <li>© {currentYear} GGA Curator</li>
